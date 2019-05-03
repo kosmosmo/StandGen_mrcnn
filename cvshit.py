@@ -1,7 +1,7 @@
 import cv2,math
 import numpy as np
-bg = cv2.imread('demo/1.jpg',-1)
-fg = cv2.imread('demo/fg.jpg',-1)
+bg = cv2.imread('demo/2.jpg',-1)
+fg = cv2.imread('demo/kqq.png',-1)
 st = cv2.imread('demo/kq.jpg')
 stp = cv2.imread('demo/kqq.png',-1)
 
@@ -25,9 +25,7 @@ def mergePng(bg,img):
 def cropImg(img,x,y,w,h):
     return img[y:y+h, x:x+w]
 
-#500,344 /245,113 / 240,120
-#500,700
-#200,500 / 200,400
+
 def cropImg2(w,h,p0,p1):
     x1 = w*p0[0]
     x2 = w*p1[0]
@@ -38,44 +36,51 @@ def cropImg2(w,h,p0,p1):
     ratio = dist/100
     return ratio
 
-def transform(x,y):
-    rows,cols,ch = stp.shape
-    M = np.float32([[1,0,100],[0,1,50]])
-    dst = cv2.warpAffine(stp,M,(cols,rows))
-    return dst
 
 def combine_two_color_images_with_anchor(img1, img2, arY, arX):
+    tx = ty = 0
     foreground, background = img1.copy(), img2.copy()
     # Check if the foreground is inbound with the new coordinates and raise an error if out of bounds
     bgH = background.shape[0]
     bgW = background.shape[1]
     fgH = foreground.shape[0]
     fgW = foreground.shape[1]
-    print (fgH+arY,bgH)
     if fgH+arY > bgH:
         foreground = cropImg(foreground,0,0,fgW,fgH-(fgH+arY-bgH))
     if fgW+arX > bgW:
-        foreground = cropImg(foreground,0,0,fgH-(fgW+arX-bgW),fgW)
+        foreground = cropImg(foreground,0,0,fgW-(fgW+arX-bgW),fgH)
+    if arY <0 :
+        foreground = cropImg(foreground,0,abs(arY),fgW,fgH)
+        ty = arY
+        arY = 0
+    if arX <0 :
+        foreground = cropImg(foreground,abs(arX),0,fgW,fgH)
+        tx = arX
+        arX = 0
     cv2.imshow('composited image', foreground)
     cv2.waitKey(0)
-
-    alpha =0.5
     # do composite at specified location
     start_y = arY
     start_x = arX
-    end_y = arY+fgH
-    end_x = arX+fgW
+    end_y = arY+fgH+ty
+    end_x = arX+fgW+tx
     cv2.waitKey(0)
+    cv2.waitKey(0)
+    blended_portion = mergePng(background[start_y:end_y, start_x:end_x,:],foreground)
+    cv2.imshow('composited image', background)
+    """
     blended_portion = cv2.addWeighted(foreground,
                 alpha,
                 background[start_y:end_y, start_x:end_x,:],
                 1 - alpha,
                 0,
                 background)
+    """
     background[start_y:end_y, start_x:end_x,:] = blended_portion
     cv2.imshow('composited image', background)
     cv2.waitKey(0)
-combine_two_color_images_with_anchor(fg,bg,70,300)
+
+combine_two_color_images_with_anchor(fg,bg,100,300)
 
 
 
