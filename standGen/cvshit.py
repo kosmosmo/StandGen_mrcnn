@@ -63,7 +63,6 @@ class frame():
     def combine_two_color_images_with_anchor(self,img1, img2, arY, arX):
         tx = ty = 0
         foreground, background = img1.copy(), img2.copy()
-        # Check if the foreground is inbound with the new coordinates and raise an error if out of bounds
         bgH = background.shape[0]
         bgW = background.shape[1]
         fgH = foreground.shape[0]
