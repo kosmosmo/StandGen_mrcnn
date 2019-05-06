@@ -80,5 +80,3 @@ anchor = imageProcess.getTran(ratio,bg,p1,p1,(500,200)) #fgCenter value should g
 resizeFg = imageProcess.resize(fg,ratio)
 mergeFg2Bg = imageProcess.mergeWithAnchor(resizeFg,bg,anchor[1],anchor[0])
 newImg = imageProcess.mergePng(mergeFg2Bg,bg,mask,flag=True)
-cv2.imshow('composited image', newImg)
-cv2.waitKey(0)
