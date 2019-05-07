@@ -8,10 +8,11 @@ from mrcnn import model as modellib
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
 
-original_image = 'demo/2.jpg'
+original_image = 'demo/17.jpg'
 bg = cv2.imread(original_image,-1)
 ##will replace to frameobject
-fg = cv2.imread('demo/kqq.png',-1)
+fg = cv2.imread('demo/sp.jpeg',-1)
+fgmask = cv2.imread('demo/spMask.jpeg',-1)
 
 
 #tf-pose model and configuration crap
@@ -75,10 +76,11 @@ p0 = humans[0].body_parts[0]
 p1 = humans[0].body_parts[1]
 
 #dealing with some number and start to process
-ratio = imageProcess.getRatio(bg,p0,p1,100) #pix value should get from the standObject
-anchor = imageProcess.getTran(ratio,bg,p1,p1,(500,200)) #fgCenter value should get from the standObject
+ratio = imageProcess.getRatio(bg,p0,p1,60) #pix value should get from the standObject
+anchor = imageProcess.getTran(ratio,bg,p1,p1,(350,300)) #fgCenter value should get from the standObject
 resizeFg = imageProcess.resize(fg,ratio)
-mergeFg2Bg = imageProcess.mergeWithAnchor(resizeFg,bg,anchor[1],anchor[0])
+resizeFgmask = imageProcess.resize(fgmask,ratio)
+mergeFg2Bg = imageProcess.mergeWithAnchor(resizeFg,bg,anchor[1],anchor[0],resizeFgmask[:,:,:1])
 newImg = imageProcess.mergePng(mergeFg2Bg,bg,mask,flag=True)
 
 cv2.imshow("yes",newImg)

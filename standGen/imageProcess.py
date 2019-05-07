@@ -15,17 +15,6 @@ def createPng(h,w):
     transparent_img = np.zeros((img_height, img_width, n_channels), dtype=np.uint8)
     return transparent_img
 
-##merge fg PNG on top of bg PNG
-def mergePng(bg,fg):
-    fgMask = fg[:,:,3:]
-    img = fg[:,:,:-1]
-    bgMask = 255 - fgMask
-    imgMask = cv2.cvtColor(fgMask, cv2.COLOR_GRAY2BGR)
-    bgMask = cv2.cvtColor(bgMask, cv2.COLOR_GRAY2BGR)
-    bgNew =  (bg * (1 / 255.0)) * (bgMask * (1 / 255.0))
-    imgNew = (img * (1 / 255.0)) * (imgMask * (1 / 255.0))
-    return np.uint8(cv2.addWeighted(bgNew, 255.0, imgNew, 255.0, 0.0))
-
 #flag = using external mask. If no ex-mask, put fg in mask instead becuz some stupid bug in numpy
 def mergePng(bg,fg,mask,flag=False):
     if flag == False:
@@ -70,7 +59,7 @@ def getTran(ratio,bg,p0,p1,fgCenterPoints):
     return (int(arX),int(arY))
 
 
-def mergeWithAnchor(fg, bg, arY, arX):
+def mergeWithAnchor(fg, bg, arY, arX,mask):
     tx = ty = 0
     foreground, background = fg.copy(), bg.copy()
     bgH = background.shape[0]
@@ -80,14 +69,18 @@ def mergeWithAnchor(fg, bg, arY, arX):
     ##crop out the fg image if the fg is out bound the bg.
     if fgH+arY > bgH:
         foreground = cropImg(foreground,0,0,fgW,fgH-(fgH+arY-bgH))
+        mask = cropImg(mask,0,0,fgW,fgH-(fgH+arY-bgH))
     if fgW+arX > bgW:
         foreground = cropImg(foreground,0,0,fgW-(fgW+arX-bgW),fgH)
+        mask = cropImg(mask,0,0,fgW-(fgW+arX-bgW),fgH)
     if arY <0 :
         foreground = cropImg(foreground,0,abs(arY),fgW,fgH)
+        mask = cropImg(mask,0,abs(arY),fgW,fgH)
         ty = arY
         arY = 0
     if arX <0 :
         foreground = cropImg(foreground,abs(arX),0,fgW,fgH)
+        mask = cropImg(mask,abs(arX),0,fgW,fgH)
         tx = arX
         arX = 0
     ##image indexing
@@ -97,7 +90,7 @@ def mergeWithAnchor(fg, bg, arY, arX):
     end_x = arX+fgW+tx
     cv2.waitKey(0)
     cv2.waitKey(0)
-    blended_portion = mergePng(background[start_y:end_y, start_x:end_x,:],foreground,foreground)
+    blended_portion = mergePng(background[start_y:end_y, start_x:end_x,:],foreground,mask,flag=True)
     """
     blended_portion = cv2.addWeighted(foreground,
                 alpha,
