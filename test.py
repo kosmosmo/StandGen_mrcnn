@@ -1,14 +1,6 @@
-import cv2
-from standGen import imageProcess
-
-original_image = 'demo/2.jpg'
-bg = cv2.imread(original_image,-1)
-##will replace to frameobject
-fg = cv2.imread('demo/sp.jpeg',-1)
-fgmask = cv2.imread('demo/spMask.jpeg',-1)[:,:,:1]
-
-print (fgmask)
-newI = imageProcess.mergePng(fg,fg,fgmask,flag=True)
-
-cv2.imshow('test',newI)
-cv2.waitKey(0)
+a = {"info":[((26,False),(39,True)),(300,300)],"test":"yest"}
+import json
+path = 'stands/sp/01/'
+with open(path + 'info.json') as json_file:
+    info = json.load(json_file)
+    print(info)

@@ -8,8 +8,8 @@ from mrcnn import model as modellib
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
 
-original_image = 'demo/18.jpg'
-bg = cv2.imread(original_image,-1)
+input_video = 'video.mp4'
+capture = cv2.VideoCapture(input_video)
 ##will replace to frameobject
 fg = cv2.imread('demo/sp.jpeg',-1)
 fgmask = cv2.imread('demo/spMask.jpeg',-1)
@@ -63,25 +63,38 @@ class_names = [
 image processing shit starts here
 """
 
-#use mrcnn to generate a mask and fether the shit out of it
-results = model.detect([bg], verbose=0)
-r = results[0]
-mask = np.uint8(r['masks'][:,:,:1]*255)
-mask = imageProcess.feather(mask,100)[:,:,:1]
+fps = 25.0
+width = int(capture.get(3))
+height = int(capture.get(4))
+fcc = cv2.VideoWriter_fourcc('D', 'I', 'V', 'X')
+out = cv2.VideoWriter("new_video.avi", fcc, fps, (width, height))
+frameNum = 0
+while True:
+    ret, frame = capture.read()
+    #use mrcnn to generate a mask and fethering the shit out of it
+    results = model.detect([frame], verbose=0)
+    r = results[0]
+    mask = np.uint8(r['masks'][:,:,:1]*255)
+    mask = imageProcess.feather(mask,100)[:,:,:1]
 
+    #tf_pose to get neck joint and nose joint
+    humans = e.inference(frame, resize_to_default=(w > 0 and h > 0), upsample_size=4)
+    p0 = humans[0].body_parts[0]
+    p1 = humans[0].body_parts[1]
 
-#tf_pose to get neck joint and nose joint
-humans = e.inference(bg, resize_to_default=(w > 0 and h > 0), upsample_size=4)
-p0 = humans[0].body_parts[0]
-p1 = humans[0].body_parts[1]
+    #dealing with some number and start to process
+    ratio = imageProcess.getRatio(frame,p0,p1,60) #pix value should get from the standObject
+    anchor = imageProcess.getTran(ratio,frame,p1,p1,(350,300)) #fgCenter value should get from the standObject
+    resizeFg = imageProcess.resize(fg,ratio)
+    resizeFgmask = imageProcess.resize(fgmask,ratio)
+    mergeFg2Bg = imageProcess.mergeWithAnchor(resizeFg,frame,anchor[1],anchor[0],resizeFgmask[:,:,:1])
+    newImg = imageProcess.mergePng(mergeFg2Bg,frame,mask,flag=True)
 
-#dealing with some number and start to process
-ratio = imageProcess.getRatio(bg,p0,p1,60) #pix value should get from the standObject
-anchor = imageProcess.getTran(ratio,bg,p1,p1,(350,300)) #fgCenter value should get from the standObject
-resizeFg = imageProcess.resize(fg,ratio)
-resizeFgmask = imageProcess.resize(fgmask,ratio)
-mergeFg2Bg = imageProcess.mergeWithAnchor(resizeFg,bg,anchor[1],anchor[0],resizeFgmask[:,:,:1])
-newImg = imageProcess.mergePng(mergeFg2Bg,bg,mask,flag=True)
+    out.write(newImg)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+    print(frameNum)
+    frameNum+=1
 
-cv2.imshow("yes",newImg)
-cv2.waitKey(0)
+capture.release()
+cv2.destroyAllWindows()
