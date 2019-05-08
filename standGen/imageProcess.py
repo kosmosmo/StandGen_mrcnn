@@ -54,8 +54,15 @@ def getRatio(bg,p0,p1,pix):
 
 ##get translation x and y
 def getTran(ratio,bg,p0,p1,fgCenterPoints):
-    arY = bg.shape[0]*p1.y-(fgCenterPoints[0]*ratio)
-    arX = bg.shape[1]*p1.x-(fgCenterPoints[1]*ratio)
+    w = bg.shape[1]
+    h = bg.shape[0]
+    x1 = w*p0.x
+    x2 = w*p1.x
+    y1 = h*p0.y
+    y2 = h*p1.y
+    midpoint = ((y1+y2)/2,(x1+x2)/2)
+    arY = midpoint[0]-(fgCenterPoints[0]*ratio)
+    arX = midpoint[1]-(fgCenterPoints[1]*ratio)
     return (int(arX),int(arY))
 
 

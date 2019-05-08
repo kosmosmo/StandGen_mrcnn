@@ -36,7 +36,7 @@ class stand(object):
         return self.path+'master/master.'+str(self.curFrame).zfill(5)+'.jpg'
 
     def getMask(self):
-        return self.path+'mask/mask.'+str(self.curFrame).zfill(5)+'.jpg'
+        return self.path+'mask/master.'+str(self.curFrame).zfill(5)+'.jpg'
 
     def getAnchor(self):
         return self.anchor

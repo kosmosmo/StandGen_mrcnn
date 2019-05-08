@@ -1,7 +1,7 @@
 from standGen import standObject
 import os,time
 class frame(object):
-    def __init__(self,path,ratio,tolerance):
+    def __init__(self,path,tolerance,tranPixel):
         """
         :type stands: List[standObject] #
         """
@@ -9,9 +9,12 @@ class frame(object):
         for stand in os.listdir(path):
             self.stands.append(standObject.stand(path+stand+'/'))
         self.standIndex = 0
-        self.ratio = ratio
-        self.targetRatio = ratio
+        self.ratio = None
+        self.tran = None
+        self.targetRatio = None
+        self.targetTran = None
         self.tolerance = tolerance
+        self.tranPixel = tranPixel
 
     def setRatio(self):
         if self.targetRatio > self.ratio+(self.ratio*self.tolerance):
@@ -21,10 +24,24 @@ class frame(object):
         else:
             self.ratio = self.targetRatio
 
-    def nextFrame(self,ratio):
+    def setTran(self):
+        tran = [self.tran[0],self.tran[1]]
+        if self.targetTran[0] > self.tran[0]+self.tranPixel:
+            tran[0] = self.tran[0]+self.tranPixel
+        elif self.targetTran[0] < self.tran[0]-self.tranPixel:
+            tran[0] = self.tran[0] - self.tranPixel
+        if self.targetTran[1] > self.tran[1]+self.tranPixel:
+            tran[1] = self.tran[1]+self.tranPixel
+        elif self.targetTran[1] < self.tran[1]-self.tranPixel:
+            tran[1] = self.tran[1] - self.tranPixel
+        self.tran = tran
+
+    def nextFrame(self,ratio,tran):
         self.stands[self.standIndex].nextFrame()
         self.targetRatio = ratio
+        self.targetTran = tran
         self.setRatio()
+        self.setTran()
         return self.stands[self.standIndex].curFrame
 
     def changeStand(self,index):
@@ -40,9 +57,19 @@ class frame(object):
     def getAnchor(self):
         return self.stands[self.standIndex].getAnchor()
 
+    def setInitRatio(self,ratio):
+        self.ratio = ratio
+        self.targetRatio = ratio
+
+    def setInitTran(self,tran):
+        self.tran = tran
+        self.targetRatio = tran
+
     def getRatio(self):
         return self.ratio
 
+    def getTran(self):
+        return self.tran
 
 
 
@@ -50,9 +77,3 @@ class frame(object):
 
 
 
-a = frame('../stands/sp/',1,0.05)
-while True:
-    print (a.nextFrame(0.99))
-    print (a.getMaster())
-    print (a.getRatio())
-    time.sleep(1)
