@@ -8,7 +8,7 @@ from mrcnn import model as modellib
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
 
-input_video = 'video.mp4'
+input_video = 'video_1.mp4'
 capture = cv2.VideoCapture(input_video)
 ##will replace to frameobject
 #fg = cv2.imread('demo/sp.jpeg',-1)
@@ -62,7 +62,7 @@ class_names = [
 """
 image processing shit starts here
 """
-sp = frameObject.frame('stands/sp/',0.003,3)
+sp = frameObject.frame('stands/sp/',0.001,1)
 
 
 fps = 24.0
@@ -104,7 +104,8 @@ while True:
     mergeFg2Bg = imageProcess.mergeWithAnchor(resizeFg,frame,sp.getTran()[1],sp.getTran()[0],resizeFgmask[:,:,:1])
     newImg = imageProcess.mergePng(mergeFg2Bg,frame,mask,flag=True)
 
-    out.write(newImg)
+    #out.write(newImg)
+    cv2.imwrite('out/test01.'+str(frameNum).zfill(4)+'.jpeg',newImg)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
     print(frameNum)
