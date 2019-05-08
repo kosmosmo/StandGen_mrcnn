@@ -12,9 +12,15 @@ class stand(object):
         self.path = path
         self.states = info['endFrame']
         self.anchor = info['anchor']
+        self.png = info['png']
         self.curFrame = 0
         self.curState = 0
         self.curStart = 0
+        if self.png: self.ext = '.png'
+        else: self.ext = '.jpg'
+
+    def getPng(self):
+        return self.png
 
     def resetStand(self):
         self.curFrame = 0
@@ -33,10 +39,10 @@ class stand(object):
         return self.curFrame
 
     def getMaster(self):
-        return self.path+'master/master.'+str(self.curFrame).zfill(5)+'.jpg'
+        return self.path+'master/master.'+str(self.curFrame).zfill(5)+self.ext
 
     def getMask(self):
-        return self.path+'mask/master.'+str(self.curFrame).zfill(5)+'.jpg'
+        return self.path+'mask/master.'+str(self.curFrame).zfill(5)+self.ext
 
     def getAnchor(self):
         return self.anchor

@@ -1,6 +1,6 @@
 import cv2,os,logging
 import numpy as np
-from standGen import imageProcess,frameObject
+from standGen import imageProcess,frameObject,mergeOver
 import sys
 from samples import coco
 from mrcnn import utils
@@ -63,7 +63,7 @@ class_names = [
 image processing shit starts here
 """
 sp = frameObject.frame('stands/sp/',0.001,1)
-
+go = frameObject.frame('stands/go/',0,0)
 
 fps = 24.0
 width = int(capture.get(3))
@@ -86,26 +86,14 @@ while True:
     p1 = humans[0].body_parts[1]
 
     #dealing with some number and start to process
-    ratio = imageProcess.getRatio(frame,p0,p1,60) #pix value should get from the standObject
-    if sp.getRatio() == None:
-        sp.setInitRatio(ratio)
-        anchor = imageProcess.getTran(sp.getRatio(), frame, p0, p1, sp.getAnchor())
-        sp.setInitTran(anchor)
-    else:
-        anchor = imageProcess.getTran(sp.getRatio(), frame, p0, p1, sp.getAnchor())
-        sp.nextFrame(ratio,anchor)
-
-
-    fg = cv2.imread(sp.getMaster(),-1)
-    fgmask = cv2.imread(sp.getMask(),-1)
-
-    resizeFg = imageProcess.resize(fg,sp.getRatio())
-    resizeFgmask = imageProcess.resize(fgmask,sp.getRatio())
-    mergeFg2Bg = imageProcess.mergeWithAnchor(resizeFg,frame,sp.getTran()[1],sp.getTran()[0],resizeFgmask[:,:,:1])
+    mergeFg2Bg = mergeOver.mergeOverTracking(sp,frame,p0,p1,60)
     newImg = imageProcess.mergePng(mergeFg2Bg,frame,mask,flag=True)
 
+    # overlay go object
+    mergeGo = mergeOver.mergeOverCenter(go,newImg)
+
     #out.write(newImg)
-    cv2.imwrite('out/test01.'+str(frameNum).zfill(4)+'.jpeg',newImg)
+    cv2.imwrite('out/test01.'+str(frameNum).zfill(4)+'.jpeg',mergeGo)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
     print(frameNum)

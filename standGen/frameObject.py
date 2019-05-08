@@ -17,6 +17,9 @@ class frame(object):
         self.tranPixel = tranPixel
 
     def setRatio(self):
+        print (self.targetRatio)
+        if self.targetRatio == None:
+            return
         if self.targetRatio > self.ratio+(self.ratio*self.tolerance):
             self.ratio = self.ratio+(self.ratio*self.tolerance)
         elif self.targetRatio < self.ratio-(self.ratio*self.tolerance):
@@ -36,12 +39,14 @@ class frame(object):
             tran[1] = self.tran[1] - self.tranPixel
         self.tran = tran
 
-    def nextFrame(self,ratio,tran):
+    def nextFrame(self,ratio=None,tran=None):
         self.stands[self.standIndex].nextFrame()
-        self.targetRatio = ratio
-        self.targetTran = tran
-        self.setRatio()
-        self.setTran()
+        if ratio:
+            self.targetRatio = ratio
+            self.setRatio()
+        if tran:
+            self.targetTran = tran
+            self.setTran()
         return self.stands[self.standIndex].curFrame
 
     def changeStand(self,index):
@@ -57,6 +62,9 @@ class frame(object):
     def getAnchor(self):
         return self.stands[self.standIndex].getAnchor()
 
+    def getPng(self):
+        return self.stands[self.standIndex].getPng()
+
     def setInitRatio(self,ratio):
         self.ratio = ratio
         self.targetRatio = ratio
@@ -70,6 +78,10 @@ class frame(object):
 
     def getTran(self):
         return self.tran
+
+
+
+
 
 
 

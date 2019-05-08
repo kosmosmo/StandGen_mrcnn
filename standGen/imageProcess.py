@@ -34,6 +34,11 @@ def mergePng(bg,fg,mask,flag=False):
 def cropImg(img,x,y,w,h):
     return img[y:y+h, x:x+w]
 
+def getRatioMatchHeight(bg,fg):
+    bgh = bg.shape[0]
+    fgh = fg.shape[0]
+    return bgh/float(fgh)
+
 ##p0,nose joint...p1,neck joint..
 ##pix pixel size of fg scaling distance
 def getRatio(bg,p0,p1,pix):
@@ -65,6 +70,13 @@ def getTran(ratio,bg,p0,p1,fgCenterPoints):
     arX = midpoint[1]-(fgCenterPoints[1]*ratio)
     return (int(arX),int(arY))
 
+def getTranMatchCenter(ratio,bg,fgCenterPoints):
+    w = bg.shape[1]
+    h = bg.shape[0]
+    midpoint = (h/2,w/2)
+    arY = midpoint[0]-(fgCenterPoints[1]*ratio)
+    arX = midpoint[1]-(fgCenterPoints[0]*ratio)
+    return (int(arX),int(arY))
 
 def mergeWithAnchor(fg, bg, arY, arX,mask):
     tx = ty = 0
