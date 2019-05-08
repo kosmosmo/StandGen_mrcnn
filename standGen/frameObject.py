@@ -49,6 +49,9 @@ class frame(object):
             self.setTran()
         return self.stands[self.standIndex].curFrame
 
+    def getCur(self):
+        return self.stands[self.standIndex].curFrame
+
     def changeStand(self,index):
         self.standIndex = index
         self.stands[self.standIndex].resetStand()
@@ -64,6 +67,9 @@ class frame(object):
 
     def getPng(self):
         return self.stands[self.standIndex].getPng()
+
+    def getEnd(self):
+        return self.stands[self.standIndex].getEnd()
 
     def setInitRatio(self,ratio):
         self.ratio = ratio

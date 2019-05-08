@@ -6,6 +6,7 @@ class stand(object):
         :type state:list[int]
         :type anchor:(int,int)
         """
+        self.end = False
         with open(path+'info.json') as json_file:
             info = json.load(json_file)
             json_file.close()
@@ -24,6 +25,7 @@ class stand(object):
 
     def resetStand(self):
         self.curFrame = 0
+        self.end = False
 
     def getCurFrame(self):
         return self.curFrame
@@ -32,7 +34,10 @@ class stand(object):
         self.curFrame+=1
         if self.curFrame > self.states[self.curState][0]:
             if self.states[self.curState][1] == False:
-                self.curState = (self.curState+1)%len(self.states)
+                self.curState = (self.curState+1)
+                if self.curState >= len(self.states):
+                    self.end= True
+                    return
                 self.curStart = self.curFrame
             else:
                 self.curFrame = self.curStart
@@ -46,5 +51,8 @@ class stand(object):
 
     def getAnchor(self):
         return self.anchor
+
+    def getEnd(self):
+        return self.end
 
 

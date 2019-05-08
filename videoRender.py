@@ -64,6 +64,7 @@ image processing shit starts here
 """
 sp = frameObject.frame('stands/sp/',0.001,1)
 go = frameObject.frame('stands/go/',0,0)
+explotion = frameObject.frame('stands/explotion/',0.001,1)
 
 fps = 24.0
 width = int(capture.get(3))
@@ -86,7 +87,8 @@ while True:
     p1 = humans[0].body_parts[1]
 
     #dealing with some number and start to process
-    mergeFg2Bg = mergeOver.mergeOverTracking(sp,frame,p0,p1,60)
+    mergeExp = mergeOver.mergeOverTracking(explotion,frame,p0,p1,60)
+    mergeFg2Bg = mergeOver.mergeOverTracking(sp,mergeExp,p0,p1,60)
     newImg = imageProcess.mergePng(mergeFg2Bg,frame,mask,flag=True)
 
     # overlay go object
