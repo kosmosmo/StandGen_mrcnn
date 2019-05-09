@@ -1,5 +1,7 @@
 from standGen import imageProcess
-import cv2
+import cv2,sys
+
+
 def getImg(frameObject):
     if frameObject.getPng():
         master = cv2.imread(frameObject.getMaster(),-1)[:,:,:-1]
@@ -12,7 +14,8 @@ def getImg(frameObject):
         return (master,mask)
 
 
-def mergeOverTracking(frameObject,bg,p0,p1,dis):
+def mergeOverTracking(frameObject,bg,p0,p1,dis,curFrame,frameRange = (0,sys.maxsize)):
+    if curFrame < frameRange[0] or curFrame >= frameRange[1]: return bg
     if frameObject.getEnd() == True: return bg
     ratio = imageProcess.getRatio(bg,p0,p1,dis)
     if frameObject.getRatio() == None:
@@ -36,7 +39,8 @@ def mergeOverTracking(frameObject,bg,p0,p1,dis):
                                               resizeFgmask[:,:,:1])
     return mergeFg2Bg
 
-def mergeOverCenter(frameObject,bg):
+def mergeOverCenter(frameObject,bg,curFrame,frameRange=(0,sys.maxsize)):
+    if curFrame < frameRange[0] or curFrame >= frameRange[1]: return bg
     if frameObject.getEnd() == True: return bg
     img = getImg(frameObject)
     fg = img[0]

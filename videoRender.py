@@ -1,4 +1,4 @@
-import cv2,os,logging
+import cv2,os,logging,sys
 import numpy as np
 from standGen import imageProcess,frameObject,mergeOver
 import sys
@@ -64,7 +64,9 @@ image processing shit starts here
 """
 sp = frameObject.frame('stands/sp/',0.001,1)
 go = frameObject.frame('stands/go/',0,0)
+dogo = frameObject.frame('stands/dogo/',0,0)
 explotion = frameObject.frame('stands/explotion/',0.001,1)
+
 
 fps = 24.0
 width = int(capture.get(3))
@@ -72,7 +74,7 @@ height = int(capture.get(4))
 fcc = cv2.VideoWriter_fourcc('D', 'I', 'V', 'X')
 out = cv2.VideoWriter("new_video.avi", fcc, fps, (width, height))
 frameNum = 0
-
+maxint = sys.maxsize
 while True:
     ret, frame = capture.read()
     #use mrcnn to generate a mask and fethering the shit out of it
@@ -87,15 +89,16 @@ while True:
     p1 = humans[0].body_parts[1]
 
     #dealing with some number and start to process
-    mergeExp = mergeOver.mergeOverTracking(explotion,frame,p0,p1,60)
-    mergeFg2Bg = mergeOver.mergeOverTracking(sp,mergeExp,p0,p1,60)
+    mergeExp = mergeOver.mergeOverTracking(explotion,frame,p0,p1,60,frameNum,frameRange=(24,maxint))
+    mergeFg2Bg = mergeOver.mergeOverTracking(sp,mergeExp,p0,p1,60,frameNum,frameRange=(24,maxint))
     newImg = imageProcess.mergePng(mergeFg2Bg,frame,mask,flag=True)
 
     # overlay go object
-    mergeGo = mergeOver.mergeOverCenter(go,newImg)
+    mergeGo = mergeOver.mergeOverCenter(go,newImg,frameNum,frameRange=(24,maxint))
+    mergeDogo = mergeOver.mergeOverCenter(dogo,mergeGo,frameNum,frameRange=(0,24))
 
     #out.write(newImg)
-    cv2.imwrite('out/test01.'+str(frameNum).zfill(4)+'.jpeg',mergeGo)
+    cv2.imwrite('out/test01.'+str(frameNum).zfill(4)+'.jpeg',mergeDogo)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
     print(frameNum)
