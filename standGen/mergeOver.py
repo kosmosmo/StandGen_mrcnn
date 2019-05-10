@@ -52,3 +52,24 @@ def mergeOverCenter(frameObject,bg,curFrame,frameRange=(0,sys.maxsize)):
     mergeOver = imageProcess.mergeWithAnchor(resizeImg,bg,goAnchor[1],goAnchor[0],resizeMask[:,:,:1])
     frameObject.nextFrame()
     return mergeOver
+
+def addOverTracking(frameObject,bg,p0,p1,dis,curFrame,frameRange = (0,sys.maxsize)):
+    if curFrame < frameRange[0] or curFrame >= frameRange[1]: return bg
+    if frameObject.getEnd() == True: return bg
+    ratio = imageProcess.getRatio(bg,p0,p1,dis)
+    if frameObject.getRatio() == None:
+        frameObject.setInitRatio(ratio)
+        anchor = imageProcess.getTran(frameObject.getRatio(), bg, p0, p1, frameObject.getAnchor())
+        frameObject.setInitTran(anchor)
+    else:
+        anchor = imageProcess.getTran(frameObject.getRatio(), bg, p0, p1, frameObject.getAnchor())
+        frameObject.nextFrame(ratio=ratio,tran=anchor)
+    ##during set init value, 1 frame has been offset, need to check again before excute
+    if frameObject.getEnd() == True: return bg
+    fg = cv2.imread(frameObject.getMaster(),-1)
+    resizeFg = imageProcess.resize(fg,frameObject.getRatio())[:,:,:3]
+    mergeFg2Bg = imageProcess.addWithAnchor(resizeFg,
+                                              bg,
+                                              frameObject.getTran()[1],
+                                              frameObject.getTran()[0])
+    return mergeFg2Bg

@@ -1,6 +1,6 @@
 import cv2,math
 import numpy as np
-
+import blend_modes
 ##resize imgage
 def resize(img, ratio):
     nwidth = int(img.shape[1] * ratio)
@@ -119,6 +119,54 @@ def mergeWithAnchor(fg, bg, arY, arX,mask):
                 background)
     """
     background[start_y:end_y, start_x:end_x,:] = blended_portion
+    return background
+
+def addWithAnchor(fg, bg, arY, arX):
+    tx = ty = 0
+    foreground, background = fg.copy(), bg.copy()
+    bgH = background.shape[0]
+    bgW = background.shape[1]
+    fgH = foreground.shape[0]
+    fgW = foreground.shape[1]
+    ##crop out the fg image if the fg is out bound the bg.
+    if fgH+arY > bgH:
+        foreground = cropImg(foreground,0,0,fgW,fgH-(fgH+arY-bgH))
+    if fgW+arX > bgW:
+        foreground = cropImg(foreground,0,0,fgW-(fgW+arX-bgW),fgH)
+    if arY <0 :
+        foreground = cropImg(foreground,0,abs(arY),fgW,fgH)
+        ty = arY
+        arY = 0
+    if arX <0 :
+        foreground = cropImg(foreground,abs(arX),0,fgW,fgH)
+        tx = arX
+        arX = 0
+    ##image indexing
+    start_y = arY
+    start_x = arX
+    end_y = arY+fgH+ty
+    end_x = arX+fgW+tx
+    cv2.waitKey(0)
+    cv2.waitKey(0)
+    foreground = cv2.cvtColor(foreground,cv2.COLOR_RGB2RGBA)
+    background = cv2.cvtColor(background,cv2.COLOR_RGB2RGBA)
+    foreground = foreground.astype(float)
+    background = background.astype(float)
+
+
+
+
+    added_portion = blend_modes.addition(background[start_y:end_y, start_x:end_x,:],foreground,1.0)
+    """
+    blended_portion = cv2.addWeighted(foreground,
+                alpha,
+                background[start_y:end_y, start_x:end_x,:],
+                1 - alpha,
+                0,
+                background)
+    """
+    background[start_y:end_y, start_x:end_x,:] = added_portion
+    background = background.astype(int)[:,:,:-1]
     return background
 
 ##feature out the mask, with n pixels, add gaussian blur at the end

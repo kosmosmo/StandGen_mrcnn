@@ -66,6 +66,7 @@ sp = frameObject.frame('stands/sp/',0.001,1)
 go = frameObject.frame('stands/go/',0,0)
 dogo = frameObject.frame('stands/dogo/',0,0)
 explotion = frameObject.frame('stands/explotion/',0.001,1)
+ora = frameObject.frame('stands/ora/',0.001,1)
 
 
 fps = 24.0
@@ -90,7 +91,8 @@ while True:
 
     #dealing with some number and start to process
     mergeExp = mergeOver.mergeOverTracking(explotion,frame,p0,p1,60,frameNum,frameRange=(24,maxint))
-    mergeFg2Bg = mergeOver.mergeOverTracking(sp,mergeExp,p0,p1,60,frameNum,frameRange=(24,maxint))
+    mergeOra = mergeOver.addOverTracking(ora,mergeExp,p0,p1,60,frameNum,frameRange=(24,maxint))
+    mergeFg2Bg = mergeOver.mergeOverTracking(sp,mergeOra,p0,p1,60,frameNum,frameRange=(24,maxint))
     newImg = imageProcess.mergePng(mergeFg2Bg,frame,mask,flag=True)
 
     # overlay go object
