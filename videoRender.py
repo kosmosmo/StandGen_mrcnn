@@ -8,7 +8,7 @@ from mrcnn import model as modellib
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
 
-input_video = 'video_1.mp4'
+input_video = 'video.mp4'
 capture = cv2.VideoCapture(input_video)
 ##will replace to frameobject
 #fg = cv2.imread('demo/sp.jpeg',-1)
@@ -62,11 +62,11 @@ class_names = [
 """
 image processing shit starts here
 """
-sp = frameObject.frame('stands/sp/',0.001,1)
+sp = frameObject.frame('stands/sp/',0.003,3)
 go = frameObject.frame('stands/go/',0,0)
 dogo = frameObject.frame('stands/dogo/',0,0)
-explotion = frameObject.frame('stands/explotion/',0.001,1)
-ora = frameObject.frame('stands/ora/',0.001,1)
+explotion = frameObject.frame('stands/explotion/',0.003,3)
+ora = frameObject.frame('stands/ora/',0.003,3)
 
 
 fps = 24.0
@@ -82,7 +82,7 @@ while True:
     results = model.detect([frame], verbose=0)
     r = results[0]
     mask = np.uint8(r['masks'][:,:,:1]*255)
-    mask = imageProcess.feather(mask,40)[:,:,:1]
+    mask = imageProcess.feather(mask,20)[:,:,:1]
 
     #tf_pose to get neck joint and nose joint
     humans = e.inference(frame, resize_to_default=(w > 0 and h > 0), upsample_size=4)
@@ -90,17 +90,17 @@ while True:
     p1 = humans[0].body_parts[1]
 
     #dealing with some number and start to process
-    mergeExp = mergeOver.mergeOverTracking(explotion,frame,p0,p1,60,frameNum,frameRange=(24,maxint))
-    mergeOra = mergeOver.addOverTracking(ora,mergeExp,p0,p1,60,frameNum,frameRange=(24,maxint))
-    mergeFg2Bg = mergeOver.mergeOverTracking(sp,mergeOra,p0,p1,60,frameNum,frameRange=(24,maxint))
+    mergeExp = mergeOver.mergeOverTracking(explotion,frame,p0,p1,60,frameNum,frameRange=(0,maxint))
+    mergeOra = mergeOver.addOverTracking(ora,mergeExp,p0,p1,60,frameNum,frameRange=(0,maxint))
+    mergeFg2Bg = mergeOver.mergeOverTracking(sp,mergeOra,p0,p1,60,frameNum,frameRange=(0,maxint))
     newImg = imageProcess.mergePng(mergeFg2Bg,frame,mask,flag=True)
 
     # overlay go object
-    mergeGo = mergeOver.mergeOverCenter(go,newImg,frameNum,frameRange=(24,maxint))
-    mergeDogo = mergeOver.mergeOverCenter(dogo,mergeGo,frameNum,frameRange=(0,24))
+    mergeGo = mergeOver.mergeOverCenter(go,newImg,frameNum,frameRange=(0,maxint))
+
 
     #out.write(newImg)
-    cv2.imwrite('out/test01.'+str(frameNum).zfill(4)+'.jpeg',mergeDogo)
+    cv2.imwrite('out/test01.'+str(frameNum).zfill(4)+'.jpeg',mergeGo)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
     print(frameNum)
