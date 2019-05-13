@@ -1,4 +1,4 @@
-# Stand Generation
+# Stand Generator
 
 Mask-RCNN and Openpose implementation for VFX rotoscoping, motion tracking and stands summonation.
 
