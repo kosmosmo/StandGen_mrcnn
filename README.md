@@ -1,4 +1,4 @@
-# Stand Generator
+# Stand Generation
 
 Mask-RCNN and Openpose implementation for VFX rotoscoping, motion tracking and stands summonation.
 
@@ -26,3 +26,9 @@ pip install blend_modes
 | Input | Output |
 |:---------|:--------------------|
 | ![](temp/inSM.gif)     | ![](temp/outSM.gif) |
+| Mask | PoseTracking |
+| ![](temp/mask.jpeg)     | ![](temp/track.jpeg) |
+
+| Compositing |
+|:---------|
+| ![](temp/comp.jpg)     |
