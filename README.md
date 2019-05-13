@@ -25,9 +25,9 @@ pip install blend_modes
 
 | Input | Output |
 |:---------|:--------------------|
-| ![](temp/inSM.gif)     | ![](temp/outSM.gif) |
+| <img src="https://github.com/kosmosmo/StandGen_mrcnn/blob/master/temp/inSM.gif" width="398" height ="224">| <img src="https://github.com/kosmosmo/StandGen_mrcnn/blob/master/temp/outSM.gif" width="398" height ="224">|
 | Mask | PoseTracking |
-| ![](temp/mask.jpeg)     | ![](temp/track.jpeg) |
+|<img src="https://github.com/kosmosmo/StandGen_mrcnn/blob/master/temp/mask.jpeg" width="398" height ="224">   | <img src="https://github.com/kosmosmo/StandGen_mrcnn/blob/master/temp/track.jpeg" width="398" height ="224">|
 
 | Compositing |
 |:---------|
