@@ -8,7 +8,7 @@ from mrcnn import model as modellib
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
 
-input_video = 'video.mp4'
+input_video = 'video_1.mp4'
 capture = cv2.VideoCapture(input_video)
 ##will replace to frameobject
 #fg = cv2.imread('demo/sp.jpeg',-1)
@@ -83,7 +83,7 @@ while True:
     r = results[0]
     mask = np.uint8(r['masks'][:,:,:1]*255)
     mask = imageProcess.feather(mask,20)[:,:,:1]
-
+    cv2.imwrite('out/mask01.' + str(frameNum).zfill(4) + '.jpeg', mask)
     #tf_pose to get neck joint and nose joint
     humans = e.inference(frame, resize_to_default=(w > 0 and h > 0), upsample_size=4)
     p0 = humans[0].body_parts[0]
